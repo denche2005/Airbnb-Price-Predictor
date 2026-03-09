@@ -7,8 +7,11 @@ venv/
 env/
 .env
 backend/artifacts/
+backend/data/Airbnb_Data.csv
+backend/data/worldwide_listings.csv.gz
 backend/data/*.csv
 backend/data/*.csv.gz
+!backend/data/barcelona.csv.gz
 .idea/
 .vscode/
 *.swp

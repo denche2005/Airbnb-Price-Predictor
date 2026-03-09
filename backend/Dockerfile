@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN python train_sample.py || echo "Sample training skipped"
+RUN python train_deploy_small.py || echo "Small deployment training skipped"
 
 EXPOSE 8000
 
