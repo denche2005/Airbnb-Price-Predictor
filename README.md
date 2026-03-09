@@ -6,7 +6,7 @@ Paste an Airbnb URL or fill a short form and the app estimates a price in the **
 
 ---
 
-## ✨ What this project shows
+## What this project shows?
 
 - **End‑to‑end ML system**: from raw Airbnb data → feature engineering → model training → API → React UI.
 - **Modern stack**: FastAPI backend, React + Vite + Tailwind frontend, Playwright scraping, Optuna hyperparameter tuning.
@@ -15,7 +15,7 @@ Paste an Airbnb URL or fill a short form and the app estimates a price in the **
 
 ---
 
-## 🧠 Model & Data
+## Model & Data
 
 - **Data source**: [Inside Airbnb](http://insideairbnb.com/get-the-data)
   - ~24 major cities across **6 continents** (New York, London, Paris, Tokyo, Barcelona, Sydney, etc.)
@@ -40,7 +40,7 @@ The app also returns the **top features by importance** so users can see what dr
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 **Backend (Python / FastAPI)**
 
@@ -71,7 +71,7 @@ The app also returns the **top features by importance** so users can see what dr
 
 ---
 
-## 🚀 Quickstart (local)
+## Quickstart (local)
 
 Requirements:
 
@@ -95,14 +95,14 @@ pip install -r requirements.txt
 ### 2. Download data & train model
 
 ```bash
-# Descargar datos de Inside Airbnb (24 ciudades)
+# Download data from Inside Airbnb (24 cities)
 python download_data.py
 
-# Entrenar el modelo mundial (puede tardar)
+# Train the model
 python train.py
 ```
 
-Esto genera los artefactos en `backend/artifacts/` (`model.pkl`, `preprocessor.pkl`, `metrics.json`, etc.).
+This generates `backend/artifacts/` (`model.pkl`, `preprocessor.pkl`, `metrics.json`, etc.).
 
 ### 3. Run backend
 
@@ -130,14 +130,14 @@ npm run dev -- --host 127.0.0.1 --port 5173
 1. Open the app in your browser.
 2. Go to the **Predictor** page.
 3. Choose:
-   - **Paste URL**: pega un link de Airbnb (por ejemplo, `.com`, `.es`, etc.) y el sistema:
-     - Usa Playwright para scrapear detalles básicos.
-     - Predice el precio nocturno en la **moneda local**.
-   - **Manual input**: rellena ciudad, habitaciones, reviews, amenities, etc.
-4. Revisa:
-   - Precio estimado
-   - Rango de confianza
-   - Variables más importantes para ese caso.
+   - **Paste URL**: paste an Airbnb link (por ejemplo, `.com`, `.es`, etc.) and the system will:
+     - Use Playwright to scrape basic details.
+     - Predict the nightly rate in the local currency.
+   - Manual input: fill in city, number of rooms, reviews, amenities, etc.
+4. Review:
+   - Estimated price
+   - Confidence range
+   - Most important variables for this case.
 
 ---
 
