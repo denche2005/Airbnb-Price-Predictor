@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN python train.py || echo "Training skipped - use pre-trained artifacts"
+RUN python train_sample.py || echo "Sample training skipped"
 
 EXPOSE 8000
 
