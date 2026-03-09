@@ -1,126 +1,156 @@
-# PricebnB — Airbnb Price Predictor
+# Airbnb Price Predictor (Worldwide)
 
-A full-stack ML-powered application that predicts Airbnb nightly prices using gradient boosting models trained on 74,000+ real listings across 6 major US cities.
+ML‑powered web app that predicts the **fair nightly price** of any Airbnb listing worldwide.  
+Paste an Airbnb URL or fill a short form and the app estimates a price in the **local currency**, plus a confidence range and feature importance.
 
-## Features
+> Built by **Denys Cherednychenko** — [LinkedIn](https://www.linkedin.com/in/denys-cherednychenko2005/) · [GitHub](https://github.com/denche2005)
 
-- **ML Price Prediction** — LightGBM model tuned with Bayesian optimization (Optuna), achieving strong R² on the test set
-- **Airbnb URL Scraper** — Paste any Airbnb listing URL to automatically extract features and predict the price
-- **Manual Input Form** — Enter property details manually for instant estimates
-- **Feature Importance** — See which factors influence pricing the most
-- **Confidence Intervals** — Get low/high price range estimates
-- **Modern UI** — Airbnb-inspired responsive design built with React + Tailwind CSS
+---
 
-## Tech Stack
+## ✨ What this project shows
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, Vite, Tailwind CSS, Recharts, Lucide Icons |
-| Backend | FastAPI, Uvicorn, Python 3.11+ |
-| ML | LightGBM, XGBoost, CatBoost, Optuna, scikit-learn |
-| Scraper | Playwright (headless Chromium) |
-| Deployment | Docker Compose |
+- **End‑to‑end ML system**: from raw Airbnb data → feature engineering → model training → API → React UI.
+- **Modern stack**: FastAPI backend, React + Vite + Tailwind frontend, Playwright scraping, Optuna hyperparameter tuning.
+- **Product feel**: Airbnb‑inspired UI, URL‑based predictions, confidence intervals, feature importance chart.
 
-## Architecture
+This is designed as a **portfolio project** that recruiters can both read and _use_.
 
+---
+
+## 🧠 Model & Data
+
+- **Data source**: [Inside Airbnb](http://insideairbnb.com/get-the-data)
+  - ~24 major cities across **6 continents** (New York, London, Paris, Tokyo, Barcelona, Sydney, etc.)
+  - ~500K listings combined.
+- **Features (~45+)**:
+  - Location: city, country, latitude/longitude.
+  - Property: accommodates, bedrooms, beds, bathrooms, minimum nights, availability.
+  - Host: superhost flag, response rate, acceptance rate, listings count.
+  - Reviews: number of reviews, reviews/month, overall rating + detailed sub‑scores.
+  - Amenities: total count + key binary flags (elevator, pool, A/C, wifi, etc.).
+- **Target**: log‑price of nightly rate (per city’s local currency).
+- **Models compared**:
+  - Linear, Ridge, Lasso, ElasticNet
+  - RandomForest, GradientBoosting
+  - **XGBoost, LightGBM, CatBoost**
+- **Final model**: `XGBoost_tuned` with Optuna
+  - R² (test) ≈ **0.97**
+  - RMSE ≈ **0.36** (log‑space)
+  - 5‑fold CV R² ≈ **0.97**
+
+The app also returns the **top features by importance** so users can see what drives pricing.
+
+---
+
+## 🏗️ Architecture
+
+**Backend (Python / FastAPI)**
+
+- `backend/download_data.py`: downloads `listings.csv.gz` for 24+ cities from Inside Airbnb.
+- `app/ml/data_ingestion.py`: merges datasets, cleans & parses price, reviews, amenities, etc.
+- `app/ml/data_transformation.py`: feature engineering + `ColumnTransformer` preprocessing.
+- `app/ml/model_trainer.py`: trains 9 baseline models + Optuna tuning on top 3.
+- `app/ml/prediction_pipeline.py`: loads artifacts and runs predictions.
+- `app/api/predict.py`: `/api/predict` endpoint (JSON payload).
+- `app/api/scrape.py`: `/api/scrape` endpoint — scrapes an Airbnb URL and then predicts.
+- `app/scraper/airbnb_scraper.py`: Playwright‑based scraper with Windows‑friendly async handling.
+
+**Frontend (React / Vite / Tailwind)**
+
+- `pages/Home`: marketing‑style landing (worldwide stats, how it works).
+- `pages/Predictor`: main tool — tabs for **Paste URL** and **Manual input**.
+- `components/PredictionForm`: rich form with amenity toggles and city selector.
+- `components/PriceResult`: predicted price + confidence interval in local currency.
+- `components/FeatureImportanceChart`: Recharts bar chart of top features.
+- UI inspired by Airbnb (colors, layout, typography).
+
+**Deployment**
+
+- `docker-compose.yml` orchestrates:
+  - FastAPI backend
+  - React frontend served by Nginx
+- Separate `Dockerfile` for backend and frontend.
+
+---
+
+## 🚀 Quickstart (local)
+
+Requirements:
+
+- Python 3.10+  
+- Node.js 18+  
+- (Optional) Docker & Docker Compose
+
+### 1. Clone & install
+
+```bash
+git clone https://github.com/denche2005/Airbnb-Price-Predictor.git
+cd Airbnb-Price-Predictor
+
+# Backend
+cd backend
+python -m venv venv
+venv\Scripts\activate  # en Windows
+pip install -r requirements.txt
 ```
-User → React Frontend → FastAPI Backend → ML Pipeline → Prediction
-                                        → Playwright Scraper (for URL input)
+
+### 2. Download data & train model
+
+```bash
+# Descargar datos de Inside Airbnb (24 ciudades)
+python download_data.py
+
+# Entrenar el modelo mundial (puede tardar)
+python train.py
 ```
 
-**ML Pipeline:**
-1. **Data Ingestion** — Load 74K Airbnb listings, clean and split 80/20
-2. **Feature Engineering** — 19 base features + 3 derived (rooms_per_person, beds_per_room, bath_per_room)
-3. **Preprocessing** — Imputation + Ordinal Encoding + Standard Scaling
-4. **Model Training** — 9 baseline models → top 3 tuned with Optuna (20 trials each) → best model selected
-5. **Prediction** — Load artifacts, transform input, predict log_price, convert to USD
+Esto genera los artefactos en `backend/artifacts/` (`model.pkl`, `preprocessor.pkl`, `metrics.json`, etc.).
 
-## Quick Start
-
-### Prerequisites
-
-- Python 3.11+
-- Node.js 18+
-
-### Backend
+### 3. Run backend
 
 ```bash
 cd backend
-pip install -r requirements.txt
-python train.py        # Train the model (~10-15 min)
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-### Frontend
+- API docs: `http://127.0.0.1:8000/docs`
+
+### 4. Run frontend
 
 ```bash
 cd frontend
 npm install
-npm run dev            # Starts on http://localhost:5173
+npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
-### Docker (Alternative)
+- UI: `http://127.0.0.1:5173/`
 
-```bash
-docker-compose up --build
-# Frontend: http://localhost:5173
-# Backend:  http://localhost:8000/docs
-```
+---
 
-## API Endpoints
+## 🧑‍💻 How to use
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/predict` | Predict price from manual input |
-| POST | `/api/scrape` | Scrape Airbnb URL + predict |
-| GET | `/api/metrics` | Get model training metrics |
-| GET | `/api/health` | Health check |
+1. Open the app in your browser.
+2. Go to the **Predictor** page.
+3. Choose:
+   - **Paste URL**: pega un link de Airbnb (por ejemplo, `.com`, `.es`, etc.) y el sistema:
+     - Usa Playwright para scrapear detalles básicos.
+     - Predice el precio nocturno en la **moneda local**.
+   - **Manual input**: rellena ciudad, habitaciones, reviews, amenities, etc.
+4. Revisa:
+   - Precio estimado
+   - Rango de confianza
+   - Variables más importantes para ese caso.
 
-## Dataset
+---
 
-The model is trained on [Airbnb listing data](https://www.kaggle.com/) covering 6 US cities:
-- New York City, San Francisco, Los Angeles, Chicago, Boston, Washington D.C.
+## 🧩 Why this project
 
-**Features used (22 total):**
-- 10 numerical: amenities count, accommodates, bathrooms, lat/lng, host response rate, reviews, rating, bedrooms, beds
-- 9 categorical: property type, room type, bed type, cancellation policy, cleaning fee, city, host verification, instant bookable, host profile pic
-- 3 engineered: rooms per person, beds per room, bathrooms per room
+I built this to demonstrate:
 
-## Models Compared
+- Ability to **own an ML project end‑to‑end** (data, modeling, infra, UX).
+- Comfort with **modern Python ML stack** (pandas, scikit‑learn, XGBoost/LightGBM/CatBoost, Optuna).
+- Experience building **production‑style APIs** (FastAPI) and **frontends** (React + Tailwind).
+- Practical understanding of **real‑world data issues** (different currencies, messy amenities, missing values, etc.).
 
-| Model | Description |
-|-------|-------------|
-| Linear Regression | Baseline |
-| Ridge / Lasso / ElasticNet | Regularized linear models |
-| Random Forest | Ensemble of decision trees |
-| Gradient Boosting | Sequential boosting |
-| XGBoost | Extreme gradient boosting |
-| LightGBM | Light gradient boosting machine |
-| CatBoost | Categorical boosting |
+If you’d like a quick walkthrough or want to discuss the design/trade‑offs, feel free to reach out on [LinkedIn](https://www.linkedin.com/in/denys-cherednychenko2005/).
 
-Top 3 models are hyperparameter-tuned with Optuna (Bayesian optimization).
-
-## Project Structure
-
-```
-├── backend/
-│   ├── app/
-│   │   ├── api/          # FastAPI endpoints
-│   │   ├── ml/           # ML pipeline (ingestion, transformation, training, prediction)
-│   │   └── scraper/      # Airbnb URL scraper
-│   ├── artifacts/        # Trained model + preprocessor
-│   ├── data/             # Raw dataset
-│   └── train.py          # Training entry point
-├── frontend/
-│   ├── src/
-│   │   ├── components/   # React UI components
-│   │   ├── pages/        # Home, Predictor, About
-│   │   └── services/     # API client
-│   └── index.html
-├── docker-compose.yml
-└── README.md
-```
-
-## License
-
-MIT
