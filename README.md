@@ -3,7 +3,6 @@
 ML‑powered web app that predicts the **fair nightly price** of any Airbnb listing worldwide.  
 Paste an Airbnb URL or fill a short form and the app estimates a price in the **local currency**, plus a confidence range and feature importance.
 
-> Built by **Denys Cherednychenko** — [LinkedIn](https://www.linkedin.com/in/denys-cherednychenko2005/) · [GitHub](https://github.com/denche2005)
 
 ---
 
@@ -13,7 +12,6 @@ Paste an Airbnb URL or fill a short form and the app estimates a price in the **
 - **Modern stack**: FastAPI backend, React + Vite + Tailwind frontend, Playwright scraping, Optuna hyperparameter tuning.
 - **Product feel**: Airbnb‑inspired UI, URL‑based predictions, confidence intervals, feature importance chart.
 
-This is designed as a **portfolio project** that recruiters can both read and _use_.
 
 ---
 
