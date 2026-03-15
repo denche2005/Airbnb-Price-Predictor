@@ -6,14 +6,13 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full border border-airbnb/30 bg-airbnb/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-airbnb font-extrabold text-sm">p</span>
-            </div>
-            <span className="text-sm font-semibold text-dark">
-              price<span className="text-airbnb">bnb</span>
-            </span>
-            <span className="text-sm text-gray-airbnb ml-2">
-              ML-Powered Price Prediction
+            <img
+              src="/logo.png"
+              alt="Airbnb Predictor"
+              className="h-8 w-auto object-contain"
+            />
+            <span className="text-sm text-gray-airbnb hidden sm:inline">
+              AI-Powered Pricing Accuracy
             </span>
           </div>
 
